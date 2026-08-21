@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Rice Jump! 4: Hardcore Random Edition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        body {
+            font-family: 'Press Start 2P', monospace;
+            user-select: none;
+            -webkit-user-select: none;
+            background-color: #08090d;
+            touch-action: none;
+        }
+        canvas {
+            image-rendering: pixelated;
+            box-shadow: 0 10px 40px rgba(220, 38, 38, 0.4);
+        }
+        .retro-text {
+            text-shadow: 3px 3px 0px #000, -1px -1px 0px #ef4444;
+        }
+        .retro-btn {
+            box-shadow: 0px 6px 0px #7f1d1d;
+            transition: all 0.08s ease;
+        }
+        .retro-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0px 2px 0px #7f1d1d;
+        }
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+        .screen-shake {
+            animation: shake 0.3s;
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-start min-h-screen p-2 overflow-y-auto text-white">
+
+    <div id="main-container" class="w-full max-w-4xl flex flex-wrap justify-between items-center mb-2 px-4 z-10 mt-2 gap-2">
+        <div class="flex flex-col">
+            <h1 class="text-lg md:text-xl text-red-500 retro-text tracking-widest animate-pulse">RICE JUMP! 4</h1>
+            <div class="flex items-center gap-2 mt-1">
+                <span id="stage-badge" class="text-[10px] text-red-400 font-bold">STAGE 1 / 30</span>
+                <span id="stage-theme-badge" class="text-[9px] text-yellow-400 font-bold">★ RANDOM CHAOS WASTELAND</span>
+            </div>
+        </div>
+        
+        <div class="flex items-center bg-gray-900 px-2.5 py-1 rounded-lg border-2 border-red-900">
+            <span class="text-xs mr-1.5 text-red-500">🌐</span>
+            <select id="language-select" class="bg-gray-900 text-white text-[10px] md:text-xs font-bold outline-none cursor-pointer">
+                <option value="ko">한국어</option>
+                <option value="en">English</option>
+                <option value="zh">中文</option>
+                <option value="ja">日本語</option>
+            </select>
+        </div>
+
+        <div class="flex items-center space-x-2 text-xs md:text-sm">
+            <div class="flex items-center bg-gray-900 px-2.5 py-1 rounded-lg border-2 border-red-900">
+                <span class="text-red-500 mr-1.5">⏱</span>
+                <span id="timer-display" class="text-white font-mono">100</span>
+            </div>
+            <div class="flex items-center bg-gray-900 px-2.5 py-1 rounded-lg border-2 border-red-900">
+                <span class="text-red-500 mr-1.5">❤</span>
+                <span id="lives-display" class="text-white font-mono">1</span>
+            </div>
+            <div class="bg-gray-900 px-2.5 py-1 rounded-lg border-2 border-red-900">
+                <span class="text-yellow-400">SCORE:</span>
+                <span id="score-display" class="text-white font-mono">0000</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="relative w-full max-w-4xl aspect-[16/9] bg-slate-950 rounded-xl overflow-hidden border-4 border-red-900 shadow-2xl">
+        
+        <div id="boss-hp-container" class="absolute top-4 left-1/2 -translate-x-1/2 w-2/3 max-w-md bg-black/90 border-2 border-red-600 p-1.5 rounded-lg hidden z-10 shadow-lg">
+            <div class="flex justify-between text-[8px] md:text-[9px] mb-1">
+                <span id="boss-hp-title" class="text-red-500 font-bold">BRUTAL RANDOM BOSS : RICE OVERLORD EX</span>
+                <span id="boss-hp-text" class="text-white font-mono">3 / 3</span>
+            </div>
+            <div class="w-full bg-gray-900 h-3.5 rounded border border-red-800 overflow-hidden">
+                <div id="boss-hp-bar" class="bg-gradient-to-r from-red-600 to-yellow-500 h-full w-full transition-all duration-75"></div>
+            </div>
+        </div>
+
+        <canvas id="gameCanvas" class="w-full h-full block" width="1280" height="720"></canvas>
+
+        <div id="audio-unlock-screen" class="absolute inset-0 bg-black/95 flex flex-col items-center justify-center text-center p-6 z-30">
+            <h2 class="text-3xl md:text-5xl text-red-600 mb-4 retro-text animate-pulse">RICE JUMP! 4</h2>
+            <h3 class="text-lg md:text-xl text-yellow-400 mb-6 retro-text" data-i18n="editionTitle">HARDCORE RANDOM EDITION</h3>
+            <p id="unlock-desc" class="text-xs md:text-sm text-gray-300 mb-8 max-w-md leading-relaxed" data-i18n="unlockDesc">
+                타이틀 BGM이 무한 반복 재생됩니다!<br>
+                매 스테이지마다 완전 무작위로 생성되는 지옥의 30스테이지.<br>
+                시작하려면 아래 버튼을 탭하세요.
+            </p>
+            <button id="audio-unlock-btn" class="retro-btn px-8 py-4 bg-red-600 hover:bg-red-500 text-white font-extrabold rounded-lg border-2 border-white text-sm md:text-base cursor-pointer pointer-events-auto" data-i18n="startBtn">
+                🔥 START HARDCORE RANDOM 🔥
+            </button>
+        </div>
+
+        <div id="gameover-screen" class="absolute inset-0 bg-black/95 hidden flex flex-col items-center justify-center text-center p-6 z-20">
+            <h2 class="text-4xl md:text-6xl text-red-600 mb-4 retro-text animate-bounce" data-i18n="gameOver">YOU DIED</h2>
+            <p id="gameover-desc" class="text-xs md:text-sm text-gray-400 mb-8 leading-relaxed" data-i18n="gameoverDesc">
+                무작위 생성된 가혹한 스테이지에서 사망했습니다.<br>당신의 도전은 스테이지 1부터 다시 시작됩니다!
+            </p>
+            <button id="restart-btn" class="retro-btn px-8 py-4 bg-red-600 hover:bg-red-500 text-white font-extrabold rounded-lg border-2 border-white text-sm cursor-pointer pointer-events-auto" data-i18n="retryBtn">
+                RETRY FROM STAGE 1
+            </button>
+        </div>
+
+        <div id="clear-screen" class="absolute inset-0 bg-black/90 hidden flex flex-col items-center justify-center text-center p-6 z-20">
+            <h2 class="text-3xl md:text-4xl text-yellow-400 mb-4 retro-text animate-pulse" data-i18n="stageClear">STAGE CLEAR!!</h2>
+            <p id="clear-desc" class="text-xs text-red-300 mb-4" data-i18n="clearDesc">무작위 스테이지 생존 성공! 다음 무작위 지옥으로 향합니다.</p>
+            <p id="final-score" class="text-sm text-white mb-8 font-mono">SCORE: 0</p>
+            <button id="next-btn" class="retro-btn px-8 py-4 bg-yellow-500 hover:bg-yellow-400 text-black font-extrabold rounded-lg border-2 border-white text-sm cursor-pointer pointer-events-auto" data-i18n="nextBtn">
+                NEXT RANDOM STAGE ➔
+            </button>
+        </div>
+
+        <div id="ending-screen" class="absolute inset-0 bg-black hidden flex flex-col items-center justify-center text-center p-6 z-25">
+            <h2 class="text-3xl md:text-5xl text-yellow-400 mb-4 retro-text animate-bounce" data-i18n="godTitle">GOD OF RANDOM RICE!</h2>
+            <p class="text-base md:text-xl text-red-500 mb-6 retro-text" data-i18n="godSub">무작위 30스테이지 완벽 제패!</p>
+            <p id="ending-desc" class="text-xs md:text-sm text-gray-300 mb-8 max-w-md leading-relaxed" data-i18n="endingDesc">
+                당신은 변칙적인 모든 무작위 스테이지를 돌파한 진정한 쌀의 신입니다!
+            </p>
+            <button id="end-restart-btn" class="retro-btn px-8 py-4 bg-red-600 hover:bg-red-500 text-white font-extrabold rounded-lg border-2 border-white text-sm md:text-base cursor-pointer pointer-events-auto" data-i18n="playAgain">
+                PLAY AGAIN
+            </button>
+        </div>
+    </div>
+
+    <div class="w-full max-w-4xl mt-3 px-4 flex flex-col md:flex-row justify-between items-center gap-4 z-10">
+        <div id="controls-hint" class="hidden md:block text-[9px] text-gray-500 leading-relaxed" data-i18n="controlsHint">
+            [이동]: A, D / ◀ ▶ | [점프]: Space / ▲ | [하드코어 물총]: Shift / K
+        </div>
+
+        <div class="flex justify-between w-full md:hidden gap-4 mt-2">
+            <div class="flex gap-2">
+                <button id="btn-left" class="w-16 h-16 bg-red-950/80 active:bg-red-900 border-2 border-red-600 rounded-xl flex items-center justify-center text-xl text-white select-none pointer-events-auto touch-none">◀</button>
+                <button id="btn-right" class="w-16 h-16 bg-red-950/80 active:bg-red-900 border-2 border-red-600 rounded-xl flex items-center justify-center text-xl text-white select-none pointer-events-auto touch-none">▶</button>
+            </div>
+            
+            <div class="flex gap-2 items-center">
+                <button id="btn-shoot" class="px-5 h-16 bg-cyan-700 active:bg-cyan-600 border-2 border-cyan-400 rounded-xl flex items-center justify-center text-xs text-white font-bold select-none pointer-events-auto touch-none" data-i18n="shootBtn">
+                    SHOOT 💦
+                </button>
+                <button id="btn-jump" class="px-6 h-16 bg-red-600 active:bg-red-500 border-2 border-white rounded-xl flex items-center justify-center text-xs text-white font-bold select-none pointer-events-auto touch-none" data-i18n="jumpBtn">
+                    JUMP 🚀
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="w-full max-w-4xl mt-6 mb-4 text-center text-[8px] text-red-900 tracking-wider">
+        © RICE JUMP 4: RANDOM HARDCORE EDITION. ALL RIGHTS RESERVED.
+    </footer>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = 1280;
+            canvas.height = 720;
+        }
+        resizeCanvas();
+
+        let currentLang = 'ko';
+
+        const i18n = {
+            ko: {
+                editionTitle: "HARDCORE RANDOM EDITION",
+                unlockDesc: "타이틀 BGM이 무한 반복 재생됩니다!<br>매 스테이지마다 완전 무작위로 생성되는 지옥의 30스테이지.<br>시작하려면 아래 버튼을 탭하세요.",
+                startBtn: "🔥 START HARDCORE RANDOM 🔥",
+                gameOver: "YOU DIED",
+                gameoverDesc: "무작위 생성된 가혹한 스테이지에서 사망했습니다.<br>당신의 도전은 스테이지 1부터 다시 시작됩니다!",
+                retryBtn: "RETRY FROM STAGE 1",
+                stageClear: "STAGE CLEAR!!",
+                clearDesc: "무작위 스테이지 생존 성공! 다음 무작위 지옥으로 향합니다.",
+                nextBtn: "NEXT RANDOM STAGE ➔",
+                godTitle: "GOD OF RANDOM RICE!",
+                godSub: "무작위 30스테이지 완벽 제패!",
+                endingDesc: "당신은 변칙적인 모든 무작위 스테이지를 돌파한 진정한 쌀의 신입니다!",
+                playAgain: "PLAY AGAIN",
+                controlsHint: "[이동]: A, D / ◀ ▶ | [점프]: Space / ▲ | [하드코어 물총]: Shift / K",
+                shootBtn: "발사 💦",
+                jumpBtn: "점프 🚀"
+            },
+            en: {
+                editionTitle: "HARDCORE RANDOM EDITION",
+                unlockDesc: "Title BGM plays continuously in an infinite loop!<br>30 brutal stages fully randomized every time.<br>Tap the button below to begin.",
+                startBtn: "🔥 START HARDCORE RANDOM 🔥",
+                gameOver: "YOU DIED",
+                gameoverDesc: "You died in the harsh randomized stage.<br>Your challenge restarts from Stage 1!",
+                retryBtn: "RETRY FROM STAGE 1",
+                stageClear: "STAGE CLEAR!!",
+                clearDesc: "Random stage survived! Heading to the next chaotic hell.",
+                nextBtn: "NEXT RANDOM STAGE ➔",
+                godTitle: "GOD OF RANDOM RICE!",
+                godSub: "Completed all 30 Random Stages!",
+                endingDesc: "You are the true God of Rice who conquered all randomized anomalies!",
+                playAgain: "PLAY AGAIN",
+                controlsHint: "[Move]: A, D / ◀ ▶ | [Jump]: Space / ▲ | [Shoot]: Shift / K",
+                shootBtn: "SHOOT 💦",
+                jumpBtn: "JUMP 🚀"
+            },
+            zh: {
+                editionTitle: "HARDCORE RANDOM EDITION",
+                unlockDesc: "标题背景音乐无限循环播放！<br>每关完全随机生成的30个地狱级关卡。<br>点击下方按钮开始挑战。",
+                startBtn: "🔥 开始硬核随机模式 🔥",
+                gameOver: "YOU DIED",
+                gameoverDesc: "你在残酷的随机关卡中阵亡了。<br>你的挑战将从第1关重新开始！",
+                retryBtn: "从第1关重试",
+                stageClear: "STAGE CLEAR!!",
+                clearDesc: "成功通过随机关卡！前往下一个混沌地狱。",
+                nextBtn: "下一关随机关卡 ➔",
+                godTitle: "GOD OF RANDOM RICE!",
+                godSub: "完美通关30个随机关卡！",
+                endingDesc: "你就是突破所有变异随机关卡的真正的米神！",
+                playAgain: "重新游玩",
+                controlsHint: "[移动]: A, D / ◀ ▶ | [跳跃]: Space / ▲ | [水枪]: Shift / K",
+                shootBtn: "发射 💦",
+                jumpBtn: "跳跃 🚀"
+            },
+            ja: {
+                editionTitle: "HARDCORE RANDOM EDITION",
+                unlockDesc: "タイトルBGMが無限ループ再生されます！<br>ステージごとに完全ランダム生成される地獄の30ステージ。<br>始めるには下のボタンをタップしてください。",
+                startBtn: "🔥 ハードコアランダムを開始 🔥",
+                gameOver: "YOU DIED",
+                gameoverDesc: "過酷なランダムステージで死亡しました。<br>あなたの挑戦はステージ1からやり直しになります！",
+                retryBtn: "ステージ1からリトライ",
+                stageClear: "STAGE CLEAR!!",
+                clearDesc: "ランダムステージ生存成功！次の混沌の地獄へ向かいます。",
+                nextBtn: "次のランダムステージ ➔",
+                godTitle: "GOD OF RANDOM RICE!",
+                godSub: "ランダム30ステージ完全制覇！",
+                endingDesc: "あなたは変則的なすべてのランダムステージを突破した真の米の神です！",
+                playAgain: "もう一度プレイ",
+                controlsHint: "[移動]: A, D / ◀ ▶ | [ジャンプ]: Space / ▲ | [水鉄砲]: Shift / K",
+                shootBtn: "発射 💦",
+                jumpBtn: "ジャンプ 🚀"
+            }
+        };
+
+        function updateTexts() {
+            const dict = i18n[currentLang] || i18n['en'];
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (dict[key]) {
+                    el.innerHTML = dict[key];
+                }
+            });
+        }
+
+        document.getElementById('language-select').addEventListener('change', (e) => {
+            currentLang = e.target.value;
+            updateTexts();
+        });
+
+        const titleAudio = new Audio('title.mp3');
+        titleAudio.loop = true;
+
+        const bossAudio = new Audio('보스전.mp3');
+        bossAudio.loop = true;
+        const cookerAudio = new Audio('밥솥.mp3');
+        const invincAudio = new Audio('무적.mp3');
+        invincAudio.loop = true;
+        const gunShootAudio = new Audio('gun_shoot!.mp3');
+        const bombAudio = new Audio('rice bomb!.wav');
+        const pipeAudio = new Audio('pipe.mp3');
+        const screamAudio = new Audio('으아아아악.mp3');
+        const stageClearAudio = new Audio('stage_clear.mp3');
+        const winAudio = new Audio('win.mp3');
+        const gameOverAudio = new Audio('GAME_OVER.mp3');
+
+        const drumFiles = ['드럼/bass.mp3', '드럼/snare.mp3', '드럼/hihat.mp3', '드럼/cymbal.mp3', '드럼/tom.mp3'];
+        let drumAudios = drumFiles.map(src => { let a = new Audio(src); a.volume = 0.5; return a; });
+        let drumTimer = null;
+        let drumIndex = 0;
+
+        function startDrumSequence() {
+            if (drumTimer) clearInterval(drumTimer);
+            drumIndex = 0;
+            drumTimer = setInterval(() => {
+                if (!gameState.isActive) return;
+                try {
+                    drumAudios[drumIndex].currentTime = 0;
+                    drumAudios[drumIndex].play().catch(() => {});
+                } catch(e) {}
+                drumIndex = (drumIndex + 1) % drumAudios.length;
+            }, 500);
+        }
+
+        function stopDrumSequence() {
+            if (drumTimer) { clearInterval(drumTimer); drumTimer = null; }
+        }
+
+        function stopAllBgm() {
+            titleAudio.pause(); titleAudio.currentTime = 0;
+            bossAudio.pause(); bossAudio.currentTime = 0;
+            invincAudio.pause(); invincAudio.currentTime = 0;
+        }
+
+        function playCurrentBgm() {
+            if (!gameState.isActive) return;
+            stopAllBgm();
+            if (player.invincible) {
+                invincAudio.play().catch(() => {});
+                return;
+            }
+            if (gameState.stage % 5 === 0) {
+                bossAudio.play().catch(() => {});
+            } else {
+                titleAudio.play().catch(() => {});
+            }
+        }
+
+        let gameState = {
+            isActive: false,
+            score: 0,
+            stage: 1,
+            lives: 1,
+            timer: 100
+        };
+
+        let player = {
+            x: 100, y: 400, w: 40, h: 54,
+            vx: 0, vy: 0, speed: 6, jumpForce: -13.5,
+            grounded: false, facing: 1,
+            invincible: false, shieldTimer: null
+        };
+
+        let cameraX = 0;
+        let platforms = [];
+        let spikeTraps = [];
+        let mysteryBlocks = [];
+        let enemies = [];
+        let projectiles = [];
+        let enemyProjectiles = [];
+        let powerUps = [];
+        let boss = null;
+        let goalSwitch = { x: 4000, y: 572, w: 48, h: 48, pressed: false };
+
+        let keys = { left: false, right: false, jump: false, shoot: false };
+
+        function triggerScreenShake() {
+            const container = document.querySelector('.relative');
+            container.classList.add('screen-shake');
+            setTimeout(() => {
+                container.classList.remove('screen-shake');
+            }, 300);
+        }
+
+        function initStage(stageNum) {
+            gameState.stage = stageNum;
+            document.getElementById('stage-badge').innerText = `STAGE ${stageNum} / 30`;
+            
+            const isBossStage = (stageNum % 5 === 0);
+            
+            const themesList = [
+                { name: "★ RANDOM BLOOD WASTELAND", bg: "#06060c", plat: "#450a0a", accent: "#dc2626" },
+                { name: "★ RANDOM TOXIC LAVA SEWERS", bg: "#0f0505", plat: "#7c2d12", accent: "#f97316" },
+                { name: "★ RANDOM ABYSSAL ACID DEPTHS", bg: "#021526", plat: "#0369a1", accent: "#38bdf8" },
+                { name: "★ RANDOM HELLFIRE VOLCANO", bg: "#180202", plat: "#991b1b", accent: "#ef4444" },
+                { name: "★ RANDOM VOID ETERNAL", bg: "#090214", plat: "#581c87", accent: "#a855f7" }
+            ];
+            let activeTheme = themesList[Math.floor(Math.random() * themesList.length)];
+            if (isBossStage) activeTheme.name = "⚡ RANDOM HARDCORE BOSS ARENA ⚡";
+
+            document.getElementById('stage-theme-badge').innerText = activeTheme.name;
+
+            player.x = 100;
+            player.y = 400;
+            player.vx = 0;
+            player.vy = 0;
+            cameraX = 0;
+            gameState.timer = Math.max(40, 100 - stageNum * 1.5);
+            document.getElementById('timer-display').innerText = Math.ceil(gameState.timer);
+
+            platforms = [];
+            spikeTraps = [];
+            mysteryBlocks = [];
+            enemies = [];
+            projectiles = [];
+            enemyProjectiles = [];
+            powerUps = [];
+            boss = null;
+
+            let levelWidth = 4500;
+            platforms.push({ x: 0, y: 620, w: levelWidth, h: 100, color: activeTheme.plat, topColor: activeTheme.accent });
+
+            let currentX = 400;
+            while (currentX < levelWidth - 600) {
+                let pW = 120 + Math.random() * 120;
+                let pH = 24;
+                let pY = 240 + Math.random() * 280;
+                
+                platforms.push({ x: currentX, y: pY, w: pW, h: pH, color: activeTheme.plat, topColor: activeTheme.accent });
+
+                if (Math.random() > 0.4) {
+                    spikeTraps.push({ x: currentX + 20, y: pY - 20, w: pW - 40, h: 20 });
+                }
+
+                if (Math.random() > 0.45) {
+                    mysteryBlocks.push({ x: currentX + pW/2 - 18, y: pY - 85, w: 36, h: 36, hit: false, type: Math.random() > 0.5 ? 'shield' : 'bomb' });
+                }
+
+                if (!isBossStage && Math.random() > 0.3) {
+                    enemies.push({
+                        x: currentX + 15, y: pY - 50, w: 40, h: 48,
+                        vx: (Math.random() > 0.5 ? 3 : -3) * (1 + stageNum * 0.04),
+                        minX: currentX, maxX: currentX + pW - 40, alive: true,
+                        shooter: Math.random() > 0.5, shootTimer: 0
+                    });
+                }
+
+                currentX += pW + (120 + Math.random() * 150);
+            }
+
+            powerUps.push({ x: 2000, y: 380, w: 40, h: 40, collected: false });
+
+            if (isBossStage) {
+                boss = {
+                    x: levelWidth - 700, y: 420, w: 120, h: 130,
+                    hp: 3 + Math.floor(stageNum / 5), maxHp: 3 + Math.floor(stageNum / 5),
+                    vx: -3.5, vy: 0, alive: true, attackTimer: 0
+                };
+                document.getElementById('boss-hp-container').classList.remove('hidden');
+                document.getElementById('boss-hp-bar').style.width = '100%';
+                document.getElementById('boss-hp-text').innerText = `${boss.hp} / ${boss.maxHp}`;
+            } else {
+                document.getElementById('boss-hp-container').classList.add('hidden');
+                goalSwitch = { x: levelWidth - 400, y: 572, w: 48, h: 48, pressed: false };
+            }
+
+            playCurrentBgm();
+            startDrumSequence();
+        }
+
+        function update() {
+            if (!gameState.isActive) return;
+
+            if (Math.random() < 0.016) {
+                gameState.timer = Math.max(0, gameState.timer - 0.05);
+                document.getElementById('timer-display').innerText = Math.ceil(gameState.timer);
+                if (gameState.timer <= 0) {
+                    triggerGameOver();
+                    return;
+                }
+            }
+
+            if (keys.left) { player.vx = -player.speed; player.facing = -1; }
+            else if (keys.right) { player.vx = player.speed; player.facing = 1; }
+            else { player.vx = 0; }
+
+            player.vy += 0.72;
+            player.x += player.vx;
+            player.y += player.vy;
+
+            player.grounded = false;
+            for (let p of platforms) {
+                if (player.x + player.w > p.x && player.x < p.x + p.w &&
+                    player.y + player.h >= p.y && player.y + player.h - player.vy <= p.y + 12) {
+                    player.y = p.y - player.h;
+                    player.vy = 0;
+                    player.grounded = true;
+                }
+            }
+
+            if (player.x < 0) player.x = 0;
+
+            cameraX = player.x - canvas.width / 3;
+            if (cameraX < 0) cameraX = 0;
+
+            for (let s of spikeTraps) {
+                if (!player.invincible && player.x + player.w - 8 > s.x && player.x + 8 < s.x + s.w &&
+                    player.y + player.h > s.y + 6 && player.y < s.y + s.h) {
+                    triggerGameOver();
+                    return;
+                }
+            }
+
+            for (let i = projectiles.length - 1; i >= 0; i--) {
+                let pr = projectiles[i];
+                pr.x += pr.vx;
+                if (boss && boss.alive) {
+                    if (pr.x > boss.x && pr.x < boss.x + boss.w && pr.y > boss.y && pr.y < boss.y + boss.h) {
+                        boss.hp--;
+                        projectiles.splice(i, 1);
+                        try { winAudio.currentTime = 0; winAudio.play().catch(()=>{}); } catch(e){}
+                        document.getElementById('boss-hp-bar').style.width = `${(boss.hp / boss.maxHp) * 100}%`;
+                        document.getElementById('boss-hp-text').innerText = `${boss.hp} / ${boss.maxHp}`;
+                        if (boss.hp <= 0) {
+                            boss.alive = false;
+                            document.getElementById('boss-hp-container').classList.add('hidden');
+                            triggerStageClear();
+                        }
+                        continue;
+                    }
+                }
+                for (let e of enemies) {
+                    if (e.alive && pr.x > e.x && pr.x < e.x + e.w && pr.y > e.y && pr.y < e.y + e.h) {
+                        e.alive = false;
+                        projectiles.splice(i, 1);
+                        gameState.score += 300;
+                        break;
+                    }
+                }
+            }
+
+            for (let i = enemyProjectiles.length - 1; i >= 0; i--) {
+                let ep = enemyProjectiles[i];
+                ep.x += ep.vx;
+                if (!player.invincible && ep.x > player.x && ep.x < player.x + player.w && ep.y > player.y && ep.y < player.y + player.h) {
+                    triggerGameOver();
+                    return;
+                }
+            }
+
+            for (let e of enemies) {
+                if (!e.alive) continue;
+                e.x += e.vx;
+                if (e.x < e.minX || e.x > e.maxX) e.vx *= -1;
+
+                if (e.shooter) {
+                    e.shootTimer++;
+                    if (e.shootTimer > 80) {
+                        e.shootTimer = 0;
+                        enemyProjectiles.push({ x: e.x, y: e.y + e.h/2, vx: e.vx > 0 ? 6.5 : -6.5 });
+                    }
+                }
+
+                if (!player.invincible && player.x + player.w > e.x + 4 && player.x < e.x + e.w - 4 && player.y + player.h > e.y + 4 && player.y < e.y + e.h - 4) {
+                    if (player.vy > 0 && player.y + player.h - player.vy <= e.y + 16) {
+                        e.alive = false;
+                        player.vy = -11;
+                        gameState.score += 500;
+                        try { bombAudio.currentTime = 0; bombAudio.play().catch(()=>{}); } catch(e){}
+                    } else {
+                        triggerGameOver();
+                        return;
+                    }
+                }
+            }
+
+            if (boss && boss.alive) {
+                boss.x += boss.vx;
+                if (boss.x < 2500 || boss.x > 4000) boss.vx *= -1;
+                boss.attackTimer++;
+                if (boss.attackTimer > 50) {
+                    boss.attackTimer = 0;
+                    enemyProjectiles.push({ x: boss.x, y: boss.y + boss.h/2, vx: -8.5 });
+                }
+
+                if (!player.invincible && player.x + player.w > boss.x && player.x < boss.x + boss.w && player.y + player.h > boss.y && player.y < boss.y + boss.h) {
+                    triggerGameOver();
+                    return;
+                }
+            }
+
+            for (let pu of powerUps) {
+                if (!pu.collected && player.x + player.w > pu.x && player.x < pu.x + pu.w && player.y + player.h > pu.y && player.y < pu.y + pu.h) {
+                    pu.collected = true;
+                    activateShield();
+                    try { cookerAudio.currentTime = 0; cookerAudio.play().catch(()=>{}); } catch(e){}
+                }
+            }
+
+            for (let mb of mysteryBlocks) {
+                if (!mb.hit && player.vy < 0 && player.x + player.w > mb.x && player.x < mb.x + mb.w && player.y <= mb.y + mb.h && player.y >= mb.y) {
+                    mb.hit = true;
+                    if (mb.type === 'shield') {
+                        powerUps.push({ x: mb.x, y: mb.y - 50, w: 40, h: 40, collected: false });
+                        cookerAudio.play().catch(()=>{});
+                    } else {
+                        gameState.score += 1000;
+                        bombAudio.play().catch(()=>{});
+                    }
+                    player.vy = 3;
+                }
+            }
+
+            if (!boss) {
+                if (!goalSwitch.pressed && player.x + player.w > goalSwitch.x && player.x < goalSwitch.x + goalSwitch.w && player.y + player.h > goalSwitch.y && player.y < goalSwitch.y + goalSwitch.h) {
+                    goalSwitch.pressed = true;
+                    triggerStageClear();
+                }
+            }
+
+            if (player.y > 780) {
+                triggerGameOver();
+            }
+
+            document.getElementById('score-display').innerText = gameState.score.toString().padStart(4, '0');
+        }
+
+        function activateShield() {
+            player.invincible = true;
+            playCurrentBgm();
+            if (player.shieldTimer) clearTimeout(player.shieldTimer);
+            player.shieldTimer = setTimeout(() => {
+                player.invincible = false;
+                playCurrentBgm();
+            }, 8000);
+        }
+
+        function triggerGameOver() {
+            gameState.isActive = false;
+            stopAllBgm();
+            stopDrumSequence();
+            triggerScreenShake();
+            try { gameOverAudio.currentTime = 0; gameOverAudio.play().catch(()=>{}); } catch(e){}
+            try { screamAudio.currentTime = 0; screamAudio.play().catch(()=>{}); } catch(e){}
+            document.getElementById('gameover-screen').classList.remove('hidden');
+        }
+
+        function triggerStageClear() {
+            gameState.isActive = false;
+            stopAllBgm();
+            stopDrumSequence();
+            try { stageClearAudio.currentTime = 0; stageClearAudio.play().catch(()=>{}); } catch(e){}
+            if (gameState.stage >= 30) {
+                document.getElementById('ending-screen').classList.remove('hidden');
+            } else {
+                document.getElementById('final-score').innerText = `SCORE: ${gameState.score}`;
+                document.getElementById('clear-screen').classList.remove('hidden');
+            }
+        }
+
+        function render() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#06060c';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.save();
+            ctx.translate(-cameraX, 0);
+
+            for (let p of platforms) {
+                ctx.fillStyle = p.color || '#450a0a';
+                ctx.fillRect(p.x, p.y, p.w, p.h);
+                ctx.fillStyle = p.topColor || '#dc2626';
+                ctx.fillRect(p.x, p.y, p.w, 6);
+                ctx.strokeStyle = '#222';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(p.x, p.y, p.w, p.h);
+            }
+
+            for (let s of spikeTraps) {
+                ctx.fillStyle = '#ef4444';
+                for (let sx = s.x; sx < s.x + s.w; sx += 16) {
+                    ctx.beginPath();
+                    ctx.moveTo(sx, s.y + s.h);
+                    ctx.lineTo(sx + 8, s.y);
+                    ctx.lineTo(sx + 16, s.y + s.h);
+                    ctx.fill();
+                }
+            }
+
+            if (!boss) {
+                ctx.fillStyle = goalSwitch.pressed ? '#10b981' : '#dc2626';
+                ctx.fillRect(goalSwitch.x, goalSwitch.pressed ? goalSwitch.y + 20 : goalSwitch.y, goalSwitch.w, goalSwitch.pressed ? 20 : goalSwitch.h);
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(goalSwitch.x, goalSwitch.pressed ? goalSwitch.y + 20 : goalSwitch.y, goalSwitch.w, goalSwitch.pressed ? 20 : goalSwitch.h);
+            }
+
+            for (let mb of mysteryBlocks) {
+                ctx.fillStyle = mb.hit ? '#374151' : '#b91c1c';
+                ctx.fillRect(mb.x, mb.y, mb.w, mb.h);
+                ctx.strokeStyle = '#ef4444';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(mb.x, mb.y, mb.w, mb.h);
+                ctx.fillStyle = '#fff';
+                ctx.font = 'bold 12px monospace';
+                ctx.fillText('!', mb.x + 13, mb.y + 25);
+            }
+
+            for (let pu of powerUps) {
+                if (!pu.collected) {
+                    ctx.fillStyle = '#f59e0b';
+                    ctx.fillRect(pu.x, pu.y, pu.w, pu.h);
+                    ctx.fillStyle = '#fff';
+                    ctx.font = 'bold 8px monospace';
+                    ctx.fillText('SHIELD', pu.x + 2, pu.y + 24);
+                }
+            }
+
+            for (let e of enemies) {
+                if (!e.alive) continue;
+                ctx.fillStyle = '#7f1d1d';
+                ctx.fillRect(e.x, e.y, e.w, e.h);
+                ctx.fillStyle = '#ef4444';
+                ctx.fillRect(e.x + 8, e.y + 10, 8, 8);
+                ctx.fillRect(e.x + 24, e.y + 10, 8, 8);
+            }
+
+            if (boss && boss.alive) {
+                ctx.fillStyle = '#581c87';
+                ctx.fillRect(boss.x, boss.y, boss.w, boss.h);
+                ctx.fillStyle = '#9333ea';
+                ctx.fillRect(boss.x + 12, boss.y + 20, boss.w - 24, boss.h - 40);
+                ctx.fillStyle = '#ff0';
+                ctx.font = 'bold 10px monospace';
+                ctx.fillText('RANDOM OVERLORD', boss.x + 5, boss.y - 10);
+            }
+
+            for (let pr of projectiles) {
+                ctx.fillStyle = '#38bdf8';
+                ctx.beginPath();
+                ctx.arc(pr.x, pr.y, 6, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            for (let ep of enemyProjectiles) {
+                ctx.fillStyle = '#ef4444';
+                ctx.beginPath();
+                ctx.arc(ep.x, ep.y, 6, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            ctx.fillStyle = player.invincible ? '#38bdf8' : '#f8fafc';
+            ctx.fillRect(player.x, player.y, player.w, player.h);
+            ctx.strokeStyle = player.invincible ? '#0284c7' : '#ef4444';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(player.x, player.y, player.w, player.h);
+
+            ctx.fillStyle = '#000';
+            let eyeX = player.facing === 1 ? player.x + 24 : player.x + 8;
+            ctx.fillRect(eyeX, player.y + 14, 6, 8);
+
+            ctx.restore();
+        }
+
+        function gameLoop() {
+            update();
+            render();
+            requestAnimationFrame(gameLoop);
+        }
+
+        window.addEventListener('load', () => {
+            titleAudio.play().catch(() => {});
+        });
+
+        window.addEventListener('keydown', e => {
+            if (e.code === 'ArrowLeft' || e.code === 'KeyA') keys.left = true;
+            if (e.code === 'ArrowRight' || e.code === 'KeyD') keys.right = true;
+            if (e.code === 'ArrowUp' || e.code === 'Space') {
+                if (player.grounded) {
+                    player.vy = player.jumpForce;
+                    player.grounded = false;
+                    try { pipeAudio.currentTime = 0; pipeAudio.play().catch(()=>{}); } catch(e){}
+                }
+            }
+            if (e.code === 'ShiftLeft' || e.code === 'ShiftRight' || e.code === 'KeyK') {
+                shootWaterGun();
+            }
+        });
+
+        window.addEventListener('keyup', e => {
+            if (e.code === 'ArrowLeft' || e.code === 'KeyA') keys.left = false;
+            if (e.code === 'ArrowRight' || e.code === 'KeyD') keys.right = false;
+        });
+
+        function shootWaterGun() {
+            try { gunShootAudio.currentTime = 0; gunShootAudio.play().catch(()=>{}); } catch(e){}
+            projectiles.push({
+                x: player.x + (player.facing === 1 ? player.w : 0),
+                y: player.y + player.h / 2,
+                vx: player.facing * 14
+            });
+        }
+
+        document.getElementById('btn-left').addEventListener('touchstart', () => { keys.left = true; });
+        document.getElementById('btn-left').addEventListener('touchend', () => { keys.left = false; });
+        document.getElementById('btn-right').addEventListener('touchstart', () => { keys.right = true; });
+        document.getElementById('btn-right').addEventListener('touchend', () => { keys.right = false; });
+        document.getElementById('btn-jump').addEventListener('click', () => {
+            if (player.grounded) { player.vy = player.jumpForce; player.grounded = false; try { pipeAudio.currentTime = 0; pipeAudio.play().catch(()=>{}); } catch(e){} }
+        });
+        document.getElementById('btn-shoot').addEventListener('click', () => { shootWaterGun(); });
+
+        document.getElementById('audio-unlock-btn').addEventListener('click', () => {
+            document.getElementById('audio-unlock-screen').classList.add('hidden');
+            titleAudio.play().catch(()=>{});
+            gameState.isActive = true;
+            initStage(1);
+        });
+
+        document.getElementById('restart-btn').addEventListener('click', () => {
+            document.getElementById('gameover-screen').classList.add('hidden');
+            gameState.score = 0;
+            gameState.isActive = true;
+            titleAudio.play().catch(()=>{});
+            initStage(1);
+        });
+
+        document.getElementById('next-btn').addEventListener('click', () => {
+            document.getElementById('clear-screen').classList.add('hidden');
+            gameState.stage++;
+            if (gameState.stage > 30) gameState.stage = 30;
+            gameState.isActive = true;
+            initStage(gameState.stage);
+        });
+
+        document.getElementById('end-restart-btn').addEventListener('click', () => {
+            document.getElementById('ending-screen').classList.add('hidden');
+            gameState.stage = 1;
+            gameState.score = 0;
+            gameState.isActive = true;
+            titleAudio.play().catch(()=>{});
+            initStage(1);
+        });
+
+        updateTexts();
+        requestAnimationFrame(gameLoop);
+    </script>
+</body>
+</html>

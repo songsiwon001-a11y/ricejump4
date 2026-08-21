@@ -37,7 +37,7 @@
             <h1 class="text-xl md:text-2xl text-yellow-400 retro-text tracking-widest animate-pulse" data-i18n="gameTitle">RICE JUMP! 4</h1>
             <div class="flex items-center gap-2 mt-1">
                 <span id="stage-badge" class="text-[10px] text-emerald-400 font-bold">STAGE 1 / 30</span>
-                <span id="stage-theme-badge" class="text-[9px] text-cyan-400 font-bold">★ RANDOM PROCEDURAL WORLD</span>
+                <span id="stage-theme-badge" class="text-[9px] text-cyan-400 font-bold">★ HARDCORE RANDOM WORLD</span>
             </div>
         </div>
         
@@ -82,7 +82,7 @@
         <div id="audio-unlock-screen" class="absolute inset-0 bg-black flex flex-col items-center justify-center text-center p-6 z-30">
             <h2 class="text-3xl md:text-5xl text-yellow-400 mb-6 retro-text animate-pulse" data-i18n="gameTitle">RICE JUMP! 4</h2>
             <p id="unlock-desc" class="text-xs md:text-sm text-gray-300 mb-8 max-w-md leading-relaxed" data-i18n="unlockDesc">
-                무작위로 생성되는 30개의 역동적인 스테이지가 당신을 기다립니다!<br>
+                극한의 하드코어 무작위 스테이지가 당신을 기다립니다!<br>
                 시작하려면 아래 버튼을 탭하세요.
             </p>
             <button id="audio-unlock-btn" class="retro-btn px-8 py-4 bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold rounded-lg border-2 border-white text-sm md:text-base cursor-pointer pointer-events-auto" data-i18n="tapToStart">
@@ -93,9 +93,9 @@
         <div id="start-screen" class="absolute inset-0 bg-black/85 hidden flex flex-col items-center justify-center text-center p-6 z-20">
             <h2 class="text-3xl md:text-5xl text-yellow-400 mb-6 retro-text animate-pulse" data-i18n="gameTitle">RICE JUMP! 4</h2>
             <p id="start-desc" class="text-xs md:text-[11px] text-gray-400 max-w-lg leading-relaxed mb-8" data-i18n="startDesc">
-                매판 새롭게 무작위 배치되는 30단계의 하드코어 모험을 돌파하세요!<br><br>
-                ★ 매 5스테이지마다 강력한 무작위 보스 등장!<br>
-                ★ 지하, 물속, 눈 세계 테마 랜덤 전환 & 대왕 밥솥 무적 아이템 등장!
+                땅 위에도 낭떠러지와 몬스터가 도사리는 하드코어 모험!<br><br>
+                ★ 1초마다 줄어드는 타이머와 무작위 함정 돌파!<br>
+                ★ 매 5스테이지 강력한 보스전 & 대왕 밥솥 무적 아이템 등장!
             </p>
             <div class="flex flex-col items-center gap-2">
                 <button id="start-btn" class="retro-btn px-8 py-4 bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold rounded-lg border-2 border-white text-sm md:text-base cursor-pointer pointer-events-auto" data-i18n="startAdventure">
@@ -107,7 +107,7 @@
         <div id="gameover-screen" class="absolute inset-0 bg-black/95 hidden flex flex-col items-center justify-center text-center p-6 z-20">
             <h2 class="text-4xl md:text-5xl text-red-600 mb-4 retro-text animate-pulse" data-i18n="gameOver">GAME OVER</h2>
             <p id="gameover-desc" class="text-xs text-gray-400 mb-8 leading-relaxed" data-i18n="gameOverDesc">
-                게임 오버되었습니다!<br>현재 스테이지부터 생명력을 충전하고 다시 도전합니다.
+                게임 오버되었습니다!<br>현재 스테이지부터 다시 도전합니다.
             </p>
             <button id="restart-btn" class="retro-btn px-8 py-4 bg-red-600 hover:bg-red-500 text-white font-extrabold rounded-lg border-2 border-white text-sm cursor-pointer pointer-events-auto" data-i18n="tryAgain">
                 현재 스테이지 재도전
@@ -126,7 +126,7 @@
         <div id="stage15-special-screen" class="absolute inset-0 bg-black/95 hidden flex flex-col items-center justify-center text-center p-6 z-25">
             <h2 class="text-2xl md:text-3xl text-yellow-400 mb-4 retro-text animate-pulse">STAGE 15 CLEAR!</h2>
             <p class="text-sm md:text-base text-emerald-300 mb-8 max-w-md leading-relaxed retro-text">
-                헉! 벌써 절반의 무작위 월드를 돌파하셨네요! 축하합니다!
+                벌써 절반의 하드코어 월드를 돌파하셨네요! 축하합니다!
             </p>
             <button id="stage15-next-btn" class="retro-btn px-8 py-4 bg-yellow-400 hover:bg-yellow-300 text-black font-extrabold rounded-lg border-2 border-white text-sm cursor-pointer pointer-events-auto">
                 후반부 스테이지로 출발!
@@ -135,9 +135,9 @@
 
         <div id="ending-screen" class="absolute inset-0 bg-black hidden flex flex-col items-center justify-center text-center p-6 z-25">
             <h2 class="text-3xl md:text-4xl text-yellow-400 mb-4 retro-text animate-bounce" data-i18n="congratulations">CONGRATULATIONS!</h2>
-            <p id="ending-msg" class="text-base md:text-xl text-emerald-400 mb-6 retro-text" data-i18n="endingCongrats">수고하셨습니다! 모든 무작위 모험이 끝났습니다!</p>
+            <p id="ending-msg" class="text-base md:text-xl text-emerald-400 mb-6 retro-text" data-i18n="endingCongrats">수고하셨습니다! 모든 모험이 끝났습니다!</p>
             <p id="ending-desc" class="text-xs md:text-sm text-gray-300 mb-8 max-w-md leading-relaxed" data-i18n="endingDesc">
-                당신은 30개의 모든 무작위 극한 스테이지를 돌파하고 쌀 세계를 구원했습니다!
+                당신은 30개의 모든 하드코어 극한 스테이지를 돌파했습니다!
             </p>
             <button id="end-restart-btn" class="retro-btn px-8 py-4 bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold rounded-lg border-2 border-white text-sm md:text-base cursor-pointer pointer-events-auto" data-i18n="playAgain">
                 다시 해보기
@@ -186,42 +186,40 @@
         const i18n = {
             ko: {
                 gameTitle: "RICE JUMP! 4",
-                unlockDesc: "무작위로 생성되는 30개의 역동적인 스테이지가 당신을 기다립니다!<br>시작하려면 아래 버튼을 탭하세요.",
+                unlockDesc: "하드코어 무작위 30스테이지가 당신을 기다립니다!<br>시작하려면 아래 버튼을 탭하세요.",
                 tapToStart: "TAP TO START ADVENTURE",
-                startDesc: "매판 새롭게 무작위 배치되는 30단계의 하드코어 모험을 돌파하세요!<br><br>★ 매 5스테이지마다 보스전!<br>★ 지하, 물속, 눈 세계 테마 랜덤 전환 & 대왕 밥솥 무적 아이템!",
+                startDesc: "땅 위에도 낭떠러지와 몬스터가 도사리는 극한의 모험!<br><br>★ 1초마다 줄어드는 타이머와 무작위 함정 돌파!<br>★ 매 5스테이지 보스전 & 대왕 밥솥 무적 아이템!",
                 startAdventure: "모험 시작하기",
                 gameOver: "GAME OVER",
-                gameOverDesc: "게임 오버되었습니다!<br>현재 스테이지부터 생명력을 충전하고 다시 도전합니다.",
+                gameOverDesc: "게임 오버되었습니다!<br>현재 스테이지부터 다시 도전합니다.",
                 tryAgain: "현재 스테이지 재도전",
                 stageClear: "STAGE CLEAR!!",
                 clearDesc: "보상으로 생명력이 회복되었습니다!",
                 nextStage: "다음 랜덤 스테이지 진입",
                 congratulations: "CONGRATULATIONS!",
-                endingCongrats: "수고하셨습니다! 모든 무작위 모험이 끝났습니다!",
-                endingDesc: "당신은 30개의 모든 무작위 극한 스테이지를 돌파하고 쌀 세계를 구원했습니다!",
+                endingCongrats: "수고하셨습니다! 모든 하드코어 모험이 끝났습니다!",
+                endingDesc: "당신은 30개의 모든 극한 스테이지를 돌파하고 세계를 구원했습니다!",
                 playAgain: "다시 해보기",
-                waterGunActive: "★ 물총 모드 활성화 ★",
                 controlsHint: "[이동]: A, D / ◀ ▶ | [점프]: Space / ▲ | [물총 발사]: Shift",
                 shootBtn: "발사 💦",
                 jumpBtn: "점프 🚀"
             },
             en: {
                 gameTitle: "RICE JUMP! 4",
-                unlockDesc: "30 procedurally generated dynamic stages await you!<br>Tap the button below to start.",
+                unlockDesc: "Hardcore procedural 30 stages await you!<br>Tap the button below to start.",
                 tapToStart: "TAP TO START ADVENTURE",
-                startDesc: "Conquer 30 randomized side-scrolling stages!<br><br>★ Boss fight every 5 stages!<br>★ Underground, Water & Snow random themes with Rice Cooker invincibility items!",
+                startDesc: "Conquer hardcore stages with pits and monsters on the ground!<br><br>★ 1-second countdown timer & random traps!<br>★ Boss fight every 5 stages & Rice Cooker items!",
                 startAdventure: "START ADVENTURE",
                 gameOver: "GAME OVER",
-                gameOverDesc: "Game Over!<br>Restoring lives and retrying current stage.",
+                gameOverDesc: "Game Over!<br>Retrying current stage.",
                 tryAgain: "RETRY CURRENT STAGE",
                 stageClear: "STAGE CLEAR!!",
                 clearDesc: "Life recovered as a reward!",
                 nextStage: "NEXT RANDOM STAGE",
                 congratulations: "CONGRATULATIONS!",
-                endingCongrats: "Great job! All random adventures are complete!",
-                endingDesc: "You conquered all 30 extreme procedural stages and saved the rice world!",
+                endingCongrats: "Great job! All hardcore adventures complete!",
+                endingDesc: "You conquered all 30 extreme procedural stages!",
                 playAgain: "PLAY AGAIN",
-                waterGunActive: "★ WATER GUN MODE ACTIVE ★",
                 controlsHint: "[Move]: A, D / ◀ ▶ | [Jump]: Space / ▲ | [Shoot]: Shift",
                 shootBtn: "SHOOT 💦",
                 jumpBtn: "JUMP 🚀"
@@ -322,7 +320,8 @@
             score: 0,
             stage: 1,
             lives: 3,
-            timer: 100
+            timer: 100,
+            timerInterval: null
         };
 
         let player = {
@@ -340,8 +339,8 @@
         let projectiles = [];
         let riceCookerItems = [];
         let boss = null;
-        let goalSwitch = { x: 3500, y: 572, w: 48, h: 48, pressed: false };
-        let snowMan = { x: 3500, y: 520, w: 48, h: 64, found: false };
+        let goalSwitch = { x: 3800, y: 572, w: 48, h: 48, pressed: false };
+        let snowMan = { x: 3800, y: 520, w: 48, h: 64, found: false };
         let pipeObject = { x: 200, y: 530, w: 55, h: 90 };
         let currentWorldType = 'normal';
         let currentThemeIndex = 0;
@@ -366,7 +365,7 @@
             }
 
             currentThemeIndex = Math.floor(Math.random() * themes.length);
-            document.getElementById('stage-theme-badge').innerText = `★ RANDOM: ${currentWorldType.toUpperCase()} (${themes[currentThemeIndex].name})`;
+            document.getElementById('stage-theme-badge').innerText = `★ HARDCORE: ${currentWorldType.toUpperCase()} (${themes[currentThemeIndex].name})`;
 
             player.x = 100;
             player.y = 400;
@@ -376,6 +375,16 @@
             gameState.timer = 100;
             document.getElementById('timer-display').innerText = gameState.timer;
 
+            if (gameState.timerInterval) clearInterval(gameState.timerInterval);
+            gameState.timerInterval = setInterval(() => {
+                if (!gameState.isActive) return;
+                gameState.timer--;
+                document.getElementById('timer-display').innerText = gameState.timer;
+                if (gameState.timer <= 0) {
+                    loseLife();
+                }
+            }, 1000);
+
             platforms = [];
             mysteryBlocks = [];
             enemies = [];
@@ -383,37 +392,56 @@
             riceCookerItems = [];
             boss = null;
 
-            let levelWidth = 3800;
-            platforms.push({ x: 0, y: 620, w: levelWidth, h: 100 });
+            let levelWidth = 4200;
 
-            for (let i = 500; i < levelWidth - 400; i += (250 + Math.random() * 120)) {
-                let pW = 140 + Math.random() * 120;
+            let currentX = 0;
+            while (currentX < levelWidth) {
+                if (currentX < 400 || currentX > levelWidth - 400 || Math.random() > 0.35) {
+                    let segW = 300 + Math.random() * 450;
+                    platforms.push({ x: currentX, y: 620, w: segW, h: 100, isGround: true });
+                    
+                    if (Math.random() > 0.5 && currentX > 600) {
+                        enemies.push({
+                            x: currentX + 80, y: 576, w: 38, h: 44,
+                            vx: (Math.random() > 0.5 ? 2 : -2),
+                            minX: currentX + 20, maxX: currentX + segW - 60, alive: true
+                        });
+                    }
+                    currentX += segW;
+                } else {
+                    let pitW = 140 + Math.random() * 180;
+                    currentX += pitW;
+                }
+            }
+
+            for (let i = 500; i < levelWidth - 400; i += (220 + Math.random() * 100)) {
+                let pW = 120 + Math.random() * 100;
                 let pH = 24;
-                let pY = 280 + Math.random() * 250;
-                platforms.push({ x: i, y: pY, w: pW, h: pH });
+                let pY = 250 + Math.random() * 250;
+                platforms.push({ x: i, y: pY, w: pW, h: pH, isGround: false });
 
-                if (Math.random() > 0.35) {
+                if (Math.random() > 0.3) {
                     mysteryBlocks.push({ 
-                        x: i + 40, 
-                        y: pY - 75 - (Math.random() * 30), 
+                        x: i + 35, 
+                        y: pY - 75 - (Math.random() * 25), 
                         w: 36, 
                         h: 36, 
                         hit: false, 
-                        type: Math.random() > 0.4 ? 'cooker' : 'score' 
+                        type: Math.random() > 0.35 ? 'cooker' : 'score' 
                     });
                 }
 
-                if (!isBossStage && Math.random() > 0.25) {
+                if (!isBossStage && Math.random() > 0.2) {
                     enemies.push({
-                        x: i + 30, y: pY - 44, w: 38, h: 44,
+                        x: i + 20, y: pY - 44, w: 38, h: 44,
                         vx: (Math.random() > 0.5 ? 2.5 : -2.5),
                         minX: i, maxX: i + pW - 38, alive: true
                     });
                 }
             }
 
-            for (let c = 0; c < 2; c++) {
-                riceCookerItems.push({ x: 1200 + c * 1200 + Math.random() * 400, y: 350 + Math.random() * 150, w: 50, h: 50, collected: false });
+            for (let c = 0; c < 3; c++) {
+                riceCookerItems.push({ x: 1000 + c * 1100 + Math.random() * 300, y: 300 + Math.random() * 180, w: 50, h: 50, collected: false });
             }
 
             pipeObject = { x: 250, y: 530, w: 55, h: 90 };
@@ -426,8 +454,8 @@
 
             if (isBossStage) {
                 boss = {
-                    x: levelWidth - 700, y: 480, w: 90, h: 110,
-                    hp: 4, maxHp: 4, vx: -2.5, alive: true, hitCooldown: 0
+                    x: levelWidth - 800, y: 480, w: 90, h: 110,
+                    hp: 4, maxHp: 4, vx: -3, alive: true, hitCooldown: 0
                 };
                 document.getElementById('boss-hp-container').classList.remove('hidden');
                 document.getElementById('boss-hp-bar').style.width = '100%';
@@ -442,15 +470,6 @@
 
         function update() {
             if (!gameState.isActive) return;
-
-            if (Math.random() < 0.016) {
-                gameState.timer = Math.max(0, gameState.timer - 0.05);
-                document.getElementById('timer-display').innerText = Math.ceil(gameState.timer);
-                if (gameState.timer <= 0) {
-                    loseLife();
-                    return;
-                }
-            }
 
             if (keys.left) { player.vx = -player.speed; player.facing = -1; }
             else if (keys.right) { player.vx = player.speed; player.facing = 1; }
@@ -525,12 +544,12 @@
 
             if (boss && boss.alive) {
                 let distToSwitch = Math.abs(boss.x - goalSwitch.x);
-                if (distToSwitch < 600) {
-                    if (player.x > boss.x) boss.x += 3.5;
-                    else boss.x -= 3.5;
+                if (distToSwitch < 700) {
+                    if (player.x > boss.x) boss.x += 4;
+                    else boss.x -= 4;
                 } else {
                     boss.x += boss.vx;
-                    if (boss.x < 2600 || boss.x > 3400) boss.vx *= -1;
+                    if (boss.x < 2800 || boss.x > 3800) boss.vx *= -1;
                 }
 
                 if (!player.invincible && player.x + player.w > boss.x && player.x < boss.x + boss.w && player.y + player.h > boss.y && player.y < boss.y + boss.h) {
@@ -596,6 +615,7 @@
 
         function loseLife() {
             if (player.invincible) return;
+            if (gameState.timerInterval) clearInterval(gameState.timerInterval);
             gameState.lives--;
             document.getElementById('lives-display').innerText = gameState.lives;
             screamAudio.play().catch(() => {});
@@ -608,6 +628,7 @@
 
         function triggerGameOver() {
             gameState.isActive = false;
+            if (gameState.timerInterval) clearInterval(gameState.timerInterval);
             stopAllBgm();
             stopDrumSequence();
             gameOverAudio.play().catch(() => {});
@@ -616,6 +637,7 @@
 
         function triggerStageClear() {
             gameState.isActive = false;
+            if (gameState.timerInterval) clearInterval(gameState.timerInterval);
             stopAllBgm();
             stopDrumSequence();
             stageClearAudio.play().catch(() => {});
@@ -630,6 +652,7 @@
 
         function triggerStage15SpecialEvent() {
             gameState.isActive = false;
+            if (gameState.timerInterval) clearInterval(gameState.timerInterval);
             stopAllBgm();
             stopDrumSequence();
             stageClearAudio.play().catch(() => {});
